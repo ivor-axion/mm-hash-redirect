@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="hr">
+<head>
+  <meta charset="UTF-8">
+  <title>Redirect Hash Demo</title>
+</head>
+<body>
+  <h2>Unesi podatke</h2>
+
+  <label>Broj: <input type="text" id="broj" value="345"></label><br><br>
+  <label>Password: <input type="password" id="password" value="MojaStikla"></label><br><br>
+  <button onclick="redirectWithHash()">Pokreni</button>
+  <p id="status" style="color: red;"></p>
+
+  <script>
+    async function redirectWithHash() {
+      const broj = document.getElementById("broj").value;
+      const password = document.getElementById("password").value;
+
+      if (!broj || !password) {
+        document.getElementById("status").textContent = "Unesi oba polja!";
+        return;
+      }
+
+      const combined = broj + ":" + password;
+      const encoder = new TextEncoder();
+      const data = encoder.encode(combined);
+      const hashBuffer = await crypto.subtle.digest("SHA-256", data);
+
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const binaryString = String.fromCharCode.apply(null, hashArray);
+      let base64Hash = btoa(binaryString)
+        .replace(/\+/g, "-")
+        .replace(/\//g, "_")
+        .replace(/=+$/, "");
+
+      window.location.href = "https://www.google.com/page/" + base64Hash;
+    }
+  </script>
+</body>
+</html>
